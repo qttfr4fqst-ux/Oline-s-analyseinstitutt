@@ -1,0 +1,243 @@
+﻿<!DOCTYPE html>
+<html lang="no">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin | Oline's Analyseinstitutt</title>
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box;}
+
+    body{
+      font-family:Arial,Helvetica,sans-serif;
+      min-height:100vh;
+      padding:24px;
+      color:#1c0f38;
+      background:linear-gradient(-45deg,#f6b8ff,#c7d6ff,#e3c8ff,#ffd5ef);
+      background-size:400% 400%;
+      animation:bgFlow 18s ease infinite;
+    }
+
+    @keyframes bgFlow{
+      0%{background-position:0% 50%;}
+      50%{background-position:100% 50%;}
+      100%{background-position:0% 50%;}
+    }
+
+    .admin-shell{
+      max-width:920px;
+      margin:0 auto;
+    }
+
+    .panel{
+      background:rgba(255,255,255,0.32);
+      backdrop-filter:blur(22px);
+      -webkit-backdrop-filter:blur(22px);
+      border:1px solid rgba(255,255,255,0.5);
+      border-radius:28px;
+      box-shadow:0 8px 40px rgba(100,40,160,0.18),0 2px 12px rgba(0,0,0,0.09);
+      padding:28px;
+      margin-top:20px;
+    }
+
+    h1{
+      font-size:2rem;
+      margin-bottom:10px;
+    }
+
+    p{
+      line-height:1.7;
+      margin-top:10px;
+    }
+
+    label{
+      display:block;
+      margin-top:18px;
+      font-weight:700;
+    }
+
+    input{
+      width:100%;
+      margin-top:8px;
+      padding:14px 16px;
+      border:0;
+      border-radius:16px;
+      font-size:1rem;
+      color:#1c0f38;
+      background:rgba(255,255,255,0.72);
+    }
+
+    button{
+      width:100%;
+      border:0;
+      padding:16px;
+      margin-top:22px;
+      border-radius:18px;
+      cursor:pointer;
+      font-size:1rem;
+      font-weight:700;
+      color:white;
+      background:linear-gradient(45deg,#ff7ed8,#9db7ff);
+      box-shadow:0 0 18px rgba(255,255,255,0.18);
+    }
+
+    .admin-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(210px,1fr));
+      gap:14px;
+      margin-top:24px;
+    }
+
+    .admin-card{
+      background:rgba(255,255,255,0.36);
+      border:1px solid rgba(255,255,255,0.52);
+      border-radius:18px;
+      padding:18px;
+      min-height:110px;
+    }
+
+    .admin-card h2{
+      font-size:1rem;
+      margin-bottom:8px;
+    }
+
+    .admin-card span{
+      display:block;
+      font-size:0.9rem;
+      line-height:1.5;
+      opacity:0.78;
+    }
+
+    .note{
+      margin-top:18px;
+      font-size:0.9rem;
+      opacity:0.78;
+    }
+
+    .error{
+      margin-top:14px;
+      color:#8b1238;
+      font-weight:700;
+      min-height:22px;
+    }
+
+    .top-row{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+    }
+
+    .logout{
+      width:auto;
+      margin-top:0;
+      padding:10px 14px;
+      border-radius:14px;
+      font-size:0.9rem;
+      background:rgba(80,30,140,0.18);
+      color:#1c0f38;
+      box-shadow:none;
+    }
+
+    .hidden{display:none;}
+
+    .back-link{
+      display:inline-block;
+      margin-top:22px;
+      color:#1c0f38;
+      text-decoration:none;
+      font-weight:700;
+    }
+  </style>
+</head>
+<body>
+  <main class="admin-shell">
+    <section class="panel" id="loginPanel">
+      <h1>Adminpanel</h1>
+      <p>Logg inn for å åpne adminområdet.</p>
+
+      <label for="username">Brukernavn</label>
+      <input id="username" autocomplete="username" placeholder="Skriv brukernavn">
+
+      <label for="password">Passord</label>
+      <input id="password" type="password" autocomplete="current-password" placeholder="Skriv passord">
+
+      <button type="button" onclick="login()">Logg inn</button>
+      <div class="error" id="loginError"></div>
+
+      <p class="note">Dette er bare en trygg test-innlogging. Ekte sikker innlogging kommer senere med Supabase.</p>
+      <a class="back-link" href="../index.html">Tilbake til forsiden</a>
+    </section>
+
+    <section class="panel hidden" id="adminPanel">
+      <div class="top-row">
+        <h1>Adminpanel</h1>
+        <button class="logout" type="button" onclick="logout()">Logg ut</button>
+      </div>
+
+      <p>Dette er første trygge versjon av adminpanelet. Foreløpig endrer det ingenting på nettsiden.</p>
+      <p>Senere skal denne siden brukes til innlegg, tips, kommentarer og sideinnhold.</p>
+
+      <div class="admin-grid">
+        <div class="admin-card">
+          <h2>Innlegg</h2>
+          <span>Opprette, redigere og slette innlegg.</span>
+        </div>
+        <div class="admin-card">
+          <h2>Kommentarer</h2>
+          <span>Godkjenne kommentarer før publisering.</span>
+        </div>
+        <div class="admin-card">
+          <h2>Tips</h2>
+          <span>Lese innsendte tips fra nettsiden.</span>
+        </div>
+        <div class="admin-card">
+          <h2>Sider</h2>
+          <span>Redigere Nyhetsavisen, Teorier, Filer og Om oss.</span>
+        </div>
+      </div>
+
+      <a class="back-link" href="../index.html">Tilbake til forsiden</a>
+    </section>
+  </main>
+
+  <script>
+    const adminUser = "oline";
+    const adminPassword = "test";
+
+    function showAdmin(){
+      document.getElementById("loginPanel").classList.add("hidden");
+      document.getElementById("adminPanel").classList.remove("hidden");
+    }
+
+    function showLogin(){
+      document.getElementById("adminPanel").classList.add("hidden");
+      document.getElementById("loginPanel").classList.remove("hidden");
+    }
+
+    function login(){
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value;
+      const error = document.getElementById("loginError");
+
+      if(username === adminUser && password === adminPassword){
+        sessionStorage.setItem("olineAdminLoggedIn","true");
+        error.textContent = "";
+        showAdmin();
+        return;
+      }
+
+      error.textContent = "Feil brukernavn eller passord.";
+    }
+
+    function logout(){
+      sessionStorage.removeItem("olineAdminLoggedIn");
+      document.getElementById("password").value = "";
+      showLogin();
+    }
+
+    if(sessionStorage.getItem("olineAdminLoggedIn") === "true"){
+      showAdmin();
+    }
+  </script>
+</body>
+</html>
