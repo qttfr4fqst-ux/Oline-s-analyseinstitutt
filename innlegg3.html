@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="no">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Innlegg | Olines Analyseinstitutt</title>
+
+    <style>
+        *{box-sizing:border-box;}
+
+        body{
+            margin:0;
+            background:#f4f4f4;
+            color:#111;
+            font-family:Arial,Helvetica,sans-serif;
+        }
+
+        header{
+            padding:30px;
+            text-align:center;
+            background:white;
+            box-shadow:0 5px 20px rgba(0,0,0,.08);
+        }
+
+        h1{margin:0;}
+
+        .container{
+            max-width:900px;
+            margin:40px auto;
+            padding:20px;
+        }
+
+        .post,
+        .interaction-box{
+            background:white;
+            border-radius:20px;
+            padding:30px;
+            margin-bottom:28px;
+            box-shadow:0 8px 20px rgba(0,0,0,.08);
+        }
+
+        .post img{
+            width:100%;
+            border-radius:15px;
+            margin:20px 0;
+        }
+
+        .dato{
+            color:#666;
+            margin-bottom:20px;
+        }
+
+        a{color:inherit;}
+
+        .tilbake{
+            display:inline-block;
+            margin-bottom:25px;
+        }
+
+        label{
+            display:block;
+            margin-top:16px;
+            margin-bottom:7px;
+            font-weight:700;
+        }
+
+        input,
+        textarea{
+            width:100%;
+            border:1px solid #ddd;
+            border-radius:14px;
+            padding:14px;
+            font:inherit;
+            color:#111;
+            background:#fff;
+        }
+
+        textarea{
+            min-height:120px;
+            resize:vertical;
+        }
+
+        button{
+            border:0;
+            border-radius:16px;
+            padding:14px 18px;
+            margin-top:16px;
+            cursor:pointer;
+            font:inherit;
+            font-weight:700;
+            color:white;
+            background:linear-gradient(45deg,#ff7ed8,#9db7ff);
+        }
+
+        .message{
+            margin-top:14px;
+            min-height:22px;
+            color:#23672d;
+            font-weight:700;
+        }
+
+        .muted{
+            color:#666;
+            line-height:1.6;
+        }
+    </style>
+</head>
+
+<body>
+
+<header>
+<h1>Innlegg</h1>
+<p>Publikasjoner fra Olines Analyseinstitutt</p>
+</header>
+
+<div class="container">
+
+<a class="tilbake" href="index.html">← Tilbake</a>
+
+<article class="post" id="postContainer">
+</article>
+
+
+<section class="interaction-box" id="commentsSection" data-post-id="">
+<p class="muted">Kommentarer publiseres ikke automatisk. De må godkjennes av administrator først.</p>
+
+<label for="commentName">Navn</label>
+<input id="commentName" placeholder="Skriv navnet ditt">
+
+<label for="commentText">Kommentar</label>
+<textarea id="commentText" placeholder="Skriv kommentaren din"></textarea>
+
+<button type="button" onclick="submitComment()">Send kommentar til godkjenning</button>
+<div class="message" id="commentMessage"></div>
+</section>
+
+<section class="interaction-box">
+<h2>Send tips</h2>
+<p class="muted">Tips blir sendt til adminpanelet.</p>
+
+<label for="tipText">Tips</label>
+<textarea id="tipText" placeholder="Skriv tipset ditt"></textarea>
+
+<button type="button" onclick="submitTip()">Send tips</button>
+<div class="message" id="tipMessage"></div>
+</section>
+
+</div>
+
+<script src="supabase-config.js"></script>
+<script>
+let postId = null;
+
+
+async function loadPost(){
+
+    const params = new URLSearchParams(window.location.search);
+
+    postId = params.get("id");
+
+    console.log("Post ID:", postId);
+
+
+    const response = await fetch(
+        SUPABASE_REST_URL + "/posts?id=eq." + postId,
+        {
+            headers: supabaseHeaders()
+        }
+    );
+
+
+    const posts = await response.json();
+
+    console.log("Innlegg:", posts);
+
+
+
+}
+loadPost();
+
+async function submitComment(){
+    const nameInput = document.getElementById("commentName");
+    const commentInput = document.getElementById("commentText");
+    const message = document.getElementById("commentMessage");
+    const name = nameInput.value.trim();
+    const comment = commentInput.value.trim();
+
+    if(!name || !comment){
+        message.textContent = "Skriv både navn og kommentar først.";
+        return;
+    }
+
+    message.textContent = "Sender kommentar...";
+
+    try{
+        const response = await fetch(SUPABASE_REST_URL + "/comments", {
+            method: "POST",
+            headers: supabaseHeaders(),
+           body: JSON.stringify({
+  post_id: postId,
+    name: name,
+    comment: comment,
+    approved: false
+})
+        });
+
+        if(!response.ok){
+            throw new Error("Kunne ikke sende kommentar.");
+        }
+
+        message.textContent = "Kommentaren er mottatt og venter på godkjenning.";
+        nameInput.value = "";
+        commentInput.value = "";
+    }catch(error){
+        message.textContent = "Kommentaren ble ikke sendt. Prøv igjen senere.";
+    }
+}
+
+async function submitTip(){
+    const tipInput = document.getElementById("tipText");
+    const message = document.getElementById("tipMessage");
+    const tip = tipInput.value.trim();
+
+    if(!tip){
+        message.textContent = "Skriv et tips først.";
+        return;
+    }
+
+    message.textContent = "Sender tips...";
+
+    try{
+        const response = await fetch(SUPABASE_REST_URL + "/tips", {
+            method: "POST",
+            headers: supabaseHeaders(),
+            body: JSON.stringify({
+                source: "innlegg",
+                tip: tip,
+                read: false
+            })
+        });
+
+        if(!response.ok){
+            throw new Error("Kunne ikke sende tips.");
+        }
+
+        message.textContent = "Tipset er mottatt og sendt til adminpanelet.";
+        tipInput.value = "";
+    }catch(error){
+        message.textContent = "Tipset ble ikke sendt. Prøv igjen senere.";
+    }
+}
+</script>
+
+</body>
+</html>
